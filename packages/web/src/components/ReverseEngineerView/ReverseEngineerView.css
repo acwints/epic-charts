@@ -1,116 +1,49 @@
 .reverse-engineer-view {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
-.re-main {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-5);
   flex: 1;
   min-height: 0;
 }
 
-.re-chart-section {
+.re-workspace {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--space-6);
+  flex: 1;
+  min-height: 0;
+}
+
+.re-chart-area {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  min-height: 0;
 }
 
-.re-chart-preview {
+.re-controls-area {
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
-  border: var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  min-height: 0;
 }
 
-.re-chart-header {
-  padding: var(--space-4) var(--space-5);
-  border-bottom: var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-}
-
-.re-chart-title {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--text-primary);
-}
-
-.re-chart-title-placeholder {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.re-chart-meta {
-  display: flex;
-  gap: var(--space-5);
-}
-
-.re-meta-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-}
-
-.meta-label {
-  color: var(--text-muted);
-}
-
-.meta-value {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.re-chart-container {
-  flex: 1;
-  min-height: 350px;
-  padding: var(--space-5);
-}
-
-.re-color-bar {
-  display: flex;
-  height: 3px;
-}
-
-.color-segment {
-  flex: 1;
-}
-
-/* Recharts overrides */
-.re-chart-preview .recharts-default-tooltip {
-  font-family: var(--font-body) !important;
-}
-
-.re-chart-preview .recharts-legend-item-text {
-  font-family: var(--font-body) !important;
-}
-
-.re-chart-preview .recharts-cartesian-axis-tick-value {
-  font-family: var(--font-mono) !important;
+.re-data-area {
+  flex-shrink: 0;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .re-chart-header {
-    flex-direction: column;
-    align-items: flex-start;
+@media (max-width: 1024px) {
+  .re-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
   }
 
-  .re-chart-container {
-    min-height: 280px;
+  .re-chart-area {
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .re-chart-area {
+    min-height: 300px;
   }
 }

@@ -4,12 +4,18 @@ import { COLOR_PALETTES } from '../types';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
+function getTheme(): 'dark' | 'light' {
+  if (typeof document === 'undefined') return 'dark';
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
 export async function generateInfographic(
   data: ChartData,
   title: string,
   colorScheme: ColorScheme
 ): Promise<string> {
   const colors = COLOR_PALETTES[colorScheme];
+  const theme = getTheme();
 
   const dataDescription = `
 Title: ${title || 'Data Visualization'}
@@ -17,6 +23,18 @@ Labels: ${data.labels.join(', ')}
 Series:
 ${data.series.map(s => `  - ${s.name}: ${s.data.join(', ')}`).join('\n')}
   `.trim();
+
+  const themeColors = theme === 'light'
+    ? {
+        background: '#ffffff or transparent',
+        primaryText: '#0f172a',
+        secondaryText: '#64748b',
+      }
+    : {
+        background: '#0a0a0f or transparent',
+        primaryText: '#f0f0f5',
+        secondaryText: '#8888a0',
+      };
 
   const prompt = `You are an expert data visualization designer. Create a beautiful, unique SVG infographic.
 
@@ -31,8 +49,10 @@ Your SVG should be:
 Color palette to use (in order of preference):
 ${colors.map((c, i) => `  ${i + 1}. ${c}`).join('\n')}
 
-Background should be transparent or very dark (#0a0a0f).
-Text should be light (#f0f0f5 for primary, #8888a0 for secondary).
+Theme: ${theme.toUpperCase()} MODE
+Background: ${themeColors.background}
+Primary text color: ${themeColors.primaryText}
+Secondary text color: ${themeColors.secondaryText}
 Use the font-family: 'Manrope', sans-serif for text.
 
 Create a unique, creative SVG infographic for this data:

@@ -58,7 +58,7 @@
   justify-content: center;
   gap: var(--space-3);
   padding: var(--space-10);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border: 1px dashed var(--text-muted);
   border-radius: var(--radius-md);
   margin: var(--space-4);
   cursor: pointer;
