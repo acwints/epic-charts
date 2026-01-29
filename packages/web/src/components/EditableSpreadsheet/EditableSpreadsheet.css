@@ -1,0 +1,263 @@
+.editable-spreadsheet {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.spreadsheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-subtle);
+  background: var(--bg-tertiary);
+}
+
+.spreadsheet-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.spreadsheet-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.dirty-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--warning);
+  padding: 2px 6px;
+  background: rgba(234, 179, 8, 0.1);
+  border-radius: 3px;
+}
+
+.spreadsheet-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spreadsheet-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.spreadsheet-action:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.spreadsheet-container {
+  overflow: auto;
+  max-height: 320px;
+}
+
+.spreadsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.spreadsheet-th,
+.spreadsheet-td {
+  padding: 0;
+  border-bottom: var(--border-subtle);
+  border-right: var(--border-subtle);
+}
+
+.spreadsheet-th:last-child,
+.spreadsheet-td:last-child {
+  border-right: none;
+}
+
+.spreadsheet-th {
+  background: var(--bg-tertiary);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.corner-cell {
+  width: 120px;
+  min-width: 120px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+}
+
+.series-header {
+  min-width: 100px;
+}
+
+.series-header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.series-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.label-cell {
+  background: var(--bg-tertiary);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 120px;
+}
+
+.label-cell-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+}
+
+.value-cell {
+  background: var(--bg-secondary);
+  min-width: 100px;
+}
+
+/* Editable Cell */
+.editable-cell {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  flex: 1;
+  cursor: text;
+}
+
+.editable-cell.header-cell {
+  font-weight: 500;
+}
+
+.cell-value {
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value-cell .cell-value {
+  font-family: var(--font-mono);
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.label-cell .cell-value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.cell-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  outline: none;
+}
+
+.value-cell .cell-input {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.editable-cell.editing {
+  padding: 0;
+}
+
+/* Delete buttons */
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.series-header-content:hover .delete-btn,
+.label-cell-content:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Row hover */
+.spreadsheet-table tbody tr:hover .value-cell {
+  background: var(--bg-tertiary);
+}
+
+/* Scrollbar */
+.spreadsheet-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.spreadsheet-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.spreadsheet-container::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+.spreadsheet-container::-webkit-scrollbar-corner {
+  background: var(--bg-tertiary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .spreadsheet-container {
+    max-height: 250px;
+  }
+
+  .corner-cell,
+  .label-cell {
+    min-width: 100px;
+    width: 100px;
+  }
+}

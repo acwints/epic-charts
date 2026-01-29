@@ -1,0 +1,112 @@
+.chart-style-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.style-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.style-picker-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.style-cards {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.style-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 180px;
+  background: var(--bg-secondary);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.style-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--bg-tertiary);
+}
+
+.style-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.recommended-badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: var(--accent);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.style-card-preview {
+  height: 100px;
+  padding: var(--space-3);
+  background: var(--bg-primary);
+}
+
+.style-card-info {
+  padding: var(--space-2) var(--space-3);
+  border-top: var(--border-subtle);
+}
+
+.style-card-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.style-card.selected .style-card-label {
+  color: var(--text-primary);
+}
+
+/* Scrollbar for horizontal scroll */
+.style-cards::-webkit-scrollbar {
+  height: 4px;
+}
+
+.style-cards::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.style-cards::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .style-card {
+    width: 150px;
+  }
+
+  .style-card-preview {
+    height: 80px;
+  }
+}

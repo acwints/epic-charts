@@ -1,0 +1,86 @@
+import { getReadOnlyClient } from './client.js';
+import { config, logger } from '../config.js';
+
+export interface MentionData {
+  mentionId: string;
+  authorId: string;
+  text: string;
+  parentTweetId: string | null;
+}
+
+let lastSinceId: string | undefined;
+
+const TRIGGER_PHRASE = 'make it epic';
+
+export async function pollMentions(): Promise<MentionData[]> {
+  const client = getReadOnlyClient();
+  const mentions: MentionData[] = [];
+
+  try {
+    const params: Parameters<typeof client.v2.userMentionTimeline>[1] = {
+      max_results: 10,
+      'tweet.fields': ['referenced_tweets', 'author_id'],
+      expansions: ['referenced_tweets.id'],
+    };
+
+    if (lastSinceId) {
+      params.since_id = lastSinceId;
+    }
+
+    const response = await client.v2.userMentionTimeline(config.bot.userId, params);
+
+    if (!response.data.data) {
+      logger.debug('No new mentions found');
+      return [];
+    }
+
+    // Update since_id for next poll
+    if (response.data.meta?.newest_id) {
+      lastSinceId = response.data.meta.newest_id;
+    }
+
+    for (const tweet of response.data.data) {
+      // Check if this is from an allowed user
+      if (config.bot.allowedUserIds.length > 0 && !config.bot.allowedUserIds.includes(tweet.author_id || '')) {
+        logger.debug({ authorId: tweet.author_id }, 'Skipping mention from non-allowed user');
+        continue;
+      }
+
+      // Check if it contains the trigger phrase
+      if (!tweet.text.toLowerCase().includes(TRIGGER_PHRASE)) {
+        logger.debug({ text: tweet.text }, 'Skipping mention without trigger phrase');
+        continue;
+      }
+
+      // Find the parent tweet (the tweet being replied to)
+      const replyToTweet = tweet.referenced_tweets?.find((ref) => ref.type === 'replied_to');
+
+      if (!replyToTweet) {
+        logger.debug({ mentionId: tweet.id }, 'Skipping mention that is not a reply');
+        continue;
+      }
+
+      mentions.push({
+        mentionId: tweet.id,
+        authorId: tweet.author_id || '',
+        text: tweet.text,
+        parentTweetId: replyToTweet.id,
+      });
+
+      logger.info(
+        { mentionId: tweet.id, parentTweetId: replyToTweet.id },
+        'Found valid trigger mention'
+      );
+    }
+  } catch (error) {
+    logger.error({ error }, 'Error polling mentions');
+    throw error;
+  }
+
+  return mentions;
+}
+
+export function setSinceId(id: string): void {
+  lastSinceId = id;
+  logger.info({ sinceId: id }, 'Set since_id for polling');
+}
