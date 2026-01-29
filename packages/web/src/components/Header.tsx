@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { RotateCcw, Sparkles } from 'lucide-react';
 import { ExportMenu } from './ExportMenu/ExportMenu';
+import { ThemeToggle } from './ThemeToggle';
 import type { ChartData } from '../types';
 import './Header.css';
 
@@ -35,6 +36,7 @@ export function Header({ onReset, hasData, data, chartRef, title }: HeaderProps)
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
+          <ThemeToggle />
           {hasData && (
             <>
               <button className="nav-button" onClick={onReset}>

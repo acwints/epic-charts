@@ -5,6 +5,16 @@
   border: var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.chart-preview--shadow {
+  box-shadow: var(--shadow-card);
+}
+
+.chart-preview--glow:hover {
+  box-shadow: var(--shadow-epic);
+  transform: translateY(-2px);
 }
 
 .chart-header {
@@ -60,13 +70,51 @@
   padding: var(--space-5);
 }
 
+/* Color bar with shimmer effect */
 .chart-color-bar {
+  position: relative;
   display: flex;
   height: 3px;
+  overflow: hidden;
+}
+
+.chart-color-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
 }
 
 .color-segment {
   flex: 1;
+  transition: transform var(--transition-fast);
+}
+
+.chart-preview:hover .color-segment {
+  transform: scaleY(1.5);
+}
+
+/* Chart grid styling */
+.chart-grid {
+  color: var(--text-muted);
 }
 
 /* Table View */
@@ -253,6 +301,30 @@
   font-family: var(--font-mono) !important;
 }
 
+/* Style variant specific overrides */
+[data-style-variant="playful"] .chart-title {
+  font-family: var(--font-playful);
+}
+
+[data-style-variant="editorial"] .chart-title {
+  font-family: var(--font-editorial);
+}
+
+[data-style-variant="minimalist"] .chart-title {
+  font-family: var(--font-minimalist);
+  font-weight: 300;
+}
+
+[data-style-variant="bold"] .chart-title {
+  font-family: var(--font-bold);
+  font-weight: 600;
+}
+
+[data-style-variant="professional"] .chart-title {
+  font-family: var(--font-professional);
+  font-weight: 500;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .chart-header {
@@ -262,5 +334,20 @@
 
   .chart-container {
     min-height: 300px;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .chart-color-bar::after {
+    animation: none;
+  }
+
+  .chart-preview--glow:hover {
+    transform: none;
+  }
+
+  .chart-preview:hover .color-segment {
+    transform: none;
   }
 }

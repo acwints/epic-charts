@@ -126,6 +126,48 @@
   font-weight: 500;
 }
 
+/* Style Variant Grid */
+.style-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.style-variant-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-3) var(--space-1);
+  font-family: var(--font-body);
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border: var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.style-variant-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
+.style-variant-button.active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.variant-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
 /* Color Scheme List */
 .color-scheme-list {
   display: grid;
@@ -293,5 +335,19 @@
 
   .chart-type-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .style-variant-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .style-variant-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .variant-label {
+    font-size: 0.55rem;
   }
 }

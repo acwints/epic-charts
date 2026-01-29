@@ -13,6 +13,7 @@ export interface ChartData {
 
 export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'radar' | 'scatter' | 'table' | 'infographic';
 export type ColorScheme = 'default' | 'monochrome' | 'warm' | 'cool' | 'editorial' | 'muted';
+export type StyleVariant = 'professional' | 'playful' | 'editorial' | 'minimalist' | 'bold';
 
 export interface ChartStyleOption {
   id: string;
@@ -31,6 +32,7 @@ export interface EditableChartState {
 export interface ChartConfig {
   type: ChartType;
   colorScheme: ColorScheme;
+  styleVariant: StyleVariant;
   showGrid: boolean;
   showLegend: boolean;
   showValues: boolean;

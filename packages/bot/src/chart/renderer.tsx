@@ -357,6 +357,7 @@ export function getDefaultConfig(data: ChartData): ChartConfig {
   return {
     type: chartType,
     colorScheme: 'default',
+    styleVariant: 'professional',
     showGrid: true,
     showLegend: data.series.length > 1,
     showValues: false,

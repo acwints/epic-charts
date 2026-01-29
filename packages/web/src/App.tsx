@@ -14,6 +14,7 @@ function App() {
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
     type: 'bar',
     colorScheme: 'default',
+    styleVariant: 'professional',
     showGrid: true,
     showLegend: true,
     showValues: false,
@@ -54,6 +55,7 @@ function App() {
     setChartConfig({
       type: 'bar',
       colorScheme: 'default',
+      styleVariant: 'professional',
       showGrid: true,
       showLegend: true,
       showValues: false,

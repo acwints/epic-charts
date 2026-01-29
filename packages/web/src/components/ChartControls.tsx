@@ -13,9 +13,14 @@ import {
   Type,
   Table,
   Sparkles,
+  Briefcase,
+  Smile,
+  Newspaper,
+  Minus,
+  Paintbrush,
 } from 'lucide-react';
-import type { ChartConfig, ChartType, ColorScheme, ChartData } from '../types';
-import { COLOR_PALETTES } from '../types';
+import type { ChartConfig, ChartType, ColorScheme, StyleVariant, ChartData } from '../types';
+import { COLOR_PALETTES, STYLE_VARIANTS } from '../types';
 import './ChartControls.css';
 
 interface ChartControlsProps {
@@ -42,6 +47,14 @@ const COLOR_SCHEMES: { id: ColorScheme; label: string }[] = [
   { id: 'editorial', label: 'Editorial' },
   { id: 'monochrome', label: 'Mono' },
   { id: 'muted', label: 'Muted' },
+];
+
+const STYLE_VARIANT_OPTIONS: { id: StyleVariant; icon: typeof Briefcase; label: string }[] = [
+  { id: 'professional', icon: Briefcase, label: 'Professional' },
+  { id: 'playful', icon: Smile, label: 'Playful' },
+  { id: 'editorial', icon: Newspaper, label: 'Editorial' },
+  { id: 'minimalist', icon: Minus, label: 'Minimal' },
+  { id: 'bold', icon: Zap, label: 'Bold' },
 ];
 
 export function ChartControls({ config, onChange, data }: ChartControlsProps) {
@@ -92,6 +105,29 @@ export function ChartControls({ config, onChange, data }: ChartControlsProps) {
               <span className="type-label">{type.label}</span>
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="control-section">
+        <label className="control-label">
+          <Paintbrush size={14} />
+          <span>Style Variant</span>
+        </label>
+        <div className="style-variant-grid">
+          {STYLE_VARIANT_OPTIONS.map((variant) => {
+            const variantConfig = STYLE_VARIANTS[variant.id];
+            return (
+              <button
+                key={variant.id}
+                className={`style-variant-button ${config.styleVariant === variant.id ? 'active' : ''}`}
+                onClick={() => updateConfig({ styleVariant: variant.id })}
+                title={variantConfig.description}
+              >
+                <variant.icon size={16} />
+                <span className="variant-label">{variant.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

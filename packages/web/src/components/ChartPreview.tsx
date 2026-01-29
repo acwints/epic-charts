@@ -25,7 +25,7 @@ import {
 } from 'recharts';
 import { RefreshCw, Sparkles } from 'lucide-react';
 import type { ChartData, ChartConfig } from '../types';
-import { COLOR_PALETTES } from '../types';
+import { COLOR_PALETTES, COLOR_GRADIENTS, STYLE_VARIANTS } from '../types';
 import { generateInfographic } from '../services/infographicGenerator';
 import './ChartPreview.css';
 
@@ -36,11 +36,12 @@ interface ChartPreviewProps {
 
 export function ChartPreview({ data, config }: ChartPreviewProps) {
   const colors = COLOR_PALETTES[config.colorScheme];
+  const gradients = COLOR_GRADIENTS[config.colorScheme];
+  const styleConfig = STYLE_VARIANTS[config.styleVariant];
   const [infographicSvg, setInfographicSvg] = useState<string | null>(null);
   const [infographicLoading, setInfographicLoading] = useState(false);
   const [infographicError, setInfographicError] = useState<string | null>(null);
 
-  // Generate infographic when type changes to infographic
   useEffect(() => {
     if (config.type === 'infographic' && !infographicSvg && !infographicLoading) {
       generateInfographicSvg();
@@ -93,6 +94,16 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       return point;
     });
   }, [data, config.type]);
+
+  const gridStrokeDasharray = useMemo(() => {
+    switch (styleConfig.chart.gridStyle) {
+      case 'solid': return '0';
+      case 'dashed': return '3 3';
+      case 'dotted': return '1 3';
+      case 'none': return '0';
+      default: return '3 3';
+    }
+  }, [styleConfig.chart.gridStyle]);
 
   const renderTable = () => {
     return (
@@ -170,13 +181,34 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
     return null;
   };
 
+  const renderGradientDefs = () => {
+    if (!styleConfig.decorations.useGradients) return null;
+
+    return (
+      <defs>
+        {gradients.slice(0, data.series.length).map(([start, end], idx) => (
+          <linearGradient key={idx} id={`gradient-${idx}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={start} stopOpacity={1} />
+            <stop offset="100%" stopColor={end} stopOpacity={0.8} />
+          </linearGradient>
+        ))}
+      </defs>
+    );
+  };
+
   const renderChart = () => {
     const commonProps = {
       data: chartData,
     };
 
-    const gridElement = config.showGrid ? (
-      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+    const showGrid = config.showGrid && styleConfig.chart.gridStyle !== 'none';
+    const gridElement = showGrid ? (
+      <CartesianGrid
+        strokeDasharray={gridStrokeDasharray}
+        stroke="currentColor"
+        strokeOpacity={styleConfig.chart.gridOpacity}
+        className="chart-grid"
+      />
     ) : null;
 
     const xAxisElement = (
@@ -185,7 +217,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
         stroke="var(--text-muted)"
         tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
         tickLine={{ stroke: 'var(--text-muted)' }}
-        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+        axisLine={{ stroke: 'var(--border-default)', strokeOpacity: 0.5 }}
       />
     );
 
@@ -194,7 +226,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
         stroke="var(--text-muted)"
         tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
         tickLine={{ stroke: 'var(--text-muted)' }}
-        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+        axisLine={{ stroke: 'var(--border-default)', strokeOpacity: 0.5 }}
       />
     );
 
@@ -222,16 +254,24 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       />
     ) : null;
 
+    const getBarFill = (idx: number) => {
+      if (styleConfig.decorations.useGradients) {
+        return `url(#gradient-${idx})`;
+      }
+      return colors[idx % colors.length];
+    };
+
     switch (config.type) {
       case 'table':
-        return null; // Handled separately
+        return null;
 
       case 'infographic':
-        return null; // Handled separately
+        return null;
 
       case 'bar':
         return (
           <BarChart {...commonProps}>
+            {renderGradientDefs()}
             {gridElement}
             {xAxisElement}
             {yAxisElement}
@@ -241,8 +281,8 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
               <Bar
                 key={series.name}
                 dataKey={series.name}
-                fill={colors[idx % colors.length]}
-                radius={[4, 4, 0, 0]}
+                fill={getBarFill(idx)}
+                radius={styleConfig.chart.barRadius}
                 animationDuration={config.animate ? 800 : 0}
                 animationBegin={idx * 100}
               />
@@ -253,6 +293,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       case 'line':
         return (
           <LineChart {...commonProps}>
+            {renderGradientDefs()}
             {gridElement}
             {xAxisElement}
             {yAxisElement}
@@ -264,9 +305,18 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
                 type="monotone"
                 dataKey={series.name}
                 stroke={colors[idx % colors.length]}
-                strokeWidth={2}
-                dot={{ fill: colors[idx % colors.length], strokeWidth: 0, r: 4 }}
-                activeDot={{ r: 6, stroke: colors[idx % colors.length], strokeWidth: 2, fill: 'var(--bg-primary)' }}
+                strokeWidth={styleConfig.chart.strokeWidth}
+                dot={styleConfig.chart.dotRadius > 0 ? {
+                  fill: colors[idx % colors.length],
+                  strokeWidth: 0,
+                  r: styleConfig.chart.dotRadius
+                } : false}
+                activeDot={{
+                  r: styleConfig.chart.activeDotRadius,
+                  stroke: colors[idx % colors.length],
+                  strokeWidth: 2,
+                  fill: 'var(--bg-primary)'
+                }}
                 animationDuration={config.animate ? 1200 : 0}
                 animationBegin={idx * 200}
               />
@@ -277,6 +327,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       case 'area':
         return (
           <AreaChart {...commonProps}>
+            {renderGradientDefs()}
             {gridElement}
             {xAxisElement}
             {yAxisElement}
@@ -288,9 +339,9 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
                 type="monotone"
                 dataKey={series.name}
                 stroke={colors[idx % colors.length]}
-                fill={colors[idx % colors.length]}
-                fillOpacity={0.3}
-                strokeWidth={2}
+                fill={styleConfig.decorations.useGradients ? `url(#gradient-${idx})` : colors[idx % colors.length]}
+                fillOpacity={styleConfig.decorations.useGradients ? 0.6 : 0.3}
+                strokeWidth={styleConfig.chart.strokeWidth}
                 animationDuration={config.animate ? 1000 : 0}
                 animationBegin={idx * 150}
               />
@@ -301,6 +352,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       case 'pie':
         return (
           <PieChart>
+            {renderGradientDefs()}
             {tooltipElement}
             {legendElement}
             <Pie
@@ -309,14 +361,17 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
               cy="50%"
               innerRadius={60}
               outerRadius={120}
-              paddingAngle={2}
+              paddingAngle={styleConfig.id === 'playful' ? 4 : 2}
               dataKey="value"
               animationDuration={config.animate ? 1000 : 0}
               label={config.showValues ? ({ name, percent }: { name?: string; percent?: number }) => `${name ?? ''} (${((percent ?? 0) * 100).toFixed(0)}%)` : false}
               labelLine={config.showValues}
             >
               {pieData.map((_, idx) => (
-                <Cell key={`cell-${idx}`} fill={colors[idx % colors.length]} />
+                <Cell
+                  key={`cell-${idx}`}
+                  fill={styleConfig.decorations.useGradients ? `url(#gradient-${idx})` : colors[idx % colors.length]}
+                />
               ))}
             </Pie>
           </PieChart>
@@ -325,7 +380,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
       case 'radar':
         return (
           <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-            <PolarGrid stroke="rgba(255,255,255,0.1)" />
+            <PolarGrid stroke="var(--text-muted)" strokeOpacity={styleConfig.chart.gridOpacity * 2} />
             <PolarAngleAxis
               dataKey="subject"
               tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
@@ -340,6 +395,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
                 stroke={colors[idx % colors.length]}
                 fill={colors[idx % colors.length]}
                 fillOpacity={0.3}
+                strokeWidth={styleConfig.chart.strokeWidth}
                 animationDuration={config.animate ? 800 : 0}
               />
             ))}
@@ -371,12 +427,15 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
     }
   };
 
+  const previewClassName = `chart-preview ${styleConfig.decorations.useGlow ? 'chart-preview--glow' : ''} ${styleConfig.decorations.useShadows ? 'chart-preview--shadow' : ''}`;
+
   return (
     <motion.div
-      className="chart-preview"
+      className={previewClassName}
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
+      data-style-variant={config.styleVariant}
     >
       <div className="chart-header">
         {config.title ? (
@@ -418,7 +477,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
             <div
               key={idx}
               className="color-segment"
-              style={{ background: color }}
+              style={{ background: styleConfig.decorations.useGradients ? `linear-gradient(90deg, ${gradients[idx % gradients.length][0]}, ${gradients[idx % gradients.length][1]})` : color }}
             />
           ))}
         </div>
