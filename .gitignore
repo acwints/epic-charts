@@ -4,8 +4,9 @@
 .env.*.local
 packages/bot/.env
 
-# Vercel
-.vercel
+# Vercel - track project.json but not other files
+.vercel/*
+!.vercel/project.json
 
 # Logs
 logs
