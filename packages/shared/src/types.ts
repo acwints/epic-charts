@@ -10,6 +10,9 @@ export interface ChartData {
   suggestedTitle?: string;
   suggestedType?: ChartType;
   aiReasoning?: string;
+  aiSummary?: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'radar' | 'scatter' | 'table' | 'infographic';

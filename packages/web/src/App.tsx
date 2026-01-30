@@ -34,38 +34,29 @@ function App() {
       updates.title = data.suggestedTitle;
     }
 
-    // If image analysis already provided a suggestion, use it
-    if (data.suggestedType) {
-      updates.type = data.suggestedType;
-      setChartData(data);
-      if (Object.keys(updates).length > 0) {
-        setChartConfig(prev => ({ ...prev, ...updates }));
-      }
-      return;
-    }
-
-    // Otherwise, use AI to recommend the best chart type
+    // Use AI to recommend the best chart type and generate a summary
     setIsProcessing(true);
     try {
-      const recommendation = await recommendChartType(data);
+      const recommendation = await recommendChartType(data, { preferredType: data.suggestedType });
+      const chosenType = data.suggestedType ?? recommendation.type;
       const enrichedData: ChartData = {
         ...data,
-        suggestedType: recommendation.type,
+        suggestedType: chosenType,
         aiReasoning: recommendation.reasoning,
+        aiSummary: recommendation.summary,
       };
       setChartData(enrichedData);
       setChartConfig(prev => ({
         ...prev,
         ...updates,
-        type: recommendation.type,
+        type: chosenType,
       }));
     } catch (error) {
       console.error('AI recommendation failed:', error);
       // Fall back to table if AI fails
+      const fallbackType = data.suggestedType ?? 'table';
       setChartData(data);
-      if (Object.keys(updates).length > 0) {
-        setChartConfig(prev => ({ ...prev, ...updates }));
-      }
+      setChartConfig(prev => ({ ...prev, ...updates, type: fallbackType }));
     } finally {
       setIsProcessing(false);
     }

@@ -6,9 +6,13 @@ const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 export interface ChartRecommendation {
   type: ChartType;
   reasoning: string;
+  summary: string;
 }
 
-export async function recommendChartType(data: ChartData): Promise<ChartRecommendation> {
+export async function recommendChartType(
+  data: ChartData,
+  options: { preferredType?: ChartType } = {}
+): Promise<ChartRecommendation> {
   const dataDescription = {
     labels: data.labels,
     series: data.series.map(s => ({
@@ -22,6 +26,10 @@ export async function recommendChartType(data: ChartData): Promise<ChartRecommen
     seriesCount: data.series.length,
   };
 
+  const preferredTypeLine = options.preferredType
+    ? `Preferred chart type: ${options.preferredType} (use this type and justify it)`
+    : 'No preferred chart type provided';
+
   const prompt = `You are a data visualization expert. Analyze the provided data and recommend the best chart type. Consider:
 - Data relationships and patterns
 - Number of data points and series
@@ -30,11 +38,13 @@ export async function recommendChartType(data: ChartData): Promise<ChartRecommen
 - Readability and clarity for the end user
 
 Available chart types: bar, line, area, pie, radar, scatter, table
+${preferredTypeLine}
 
 Respond with JSON only (no markdown):
 {
   "type": "chartType",
-  "reasoning": "A clear 1-2 sentence explanation of why this chart type is best for this data"
+  "reasoning": "A clear 1-2 sentence explanation of why this chart type is best for this data",
+  "summary": "A 1-2 sentence plain-English description of the data's key pattern"
 }
 
 Analyze this data and recommend the best chart type:
@@ -55,17 +65,28 @@ ${JSON.stringify(dataDescription, null, 2)}`;
     const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
     const parsed = JSON.parse(cleanContent);
 
+    const resolvedType = options.preferredType ?? parsed.type;
+
     // Validate the chart type
     const validTypes: ChartType[] = ['bar', 'line', 'area', 'pie', 'radar', 'scatter', 'table'];
-    if (!validTypes.includes(parsed.type)) {
-      return { type: 'table', reasoning: 'Default recommendation for flexible data viewing.' };
+    if (!validTypes.includes(resolvedType)) {
+      return {
+        type: 'table',
+        reasoning: 'Default recommendation for flexible data viewing.',
+        summary: 'Summary unavailable for this dataset.',
+      };
     }
 
     return {
-      type: parsed.type,
+      type: resolvedType,
       reasoning: parsed.reasoning || 'AI recommendation based on data analysis.',
+      summary: parsed.summary || 'Summary unavailable for this dataset.',
     };
   } catch {
-    return { type: 'table', reasoning: 'Default recommendation for flexible data viewing.' };
+    return {
+      type: 'table',
+      reasoning: 'Default recommendation for flexible data viewing.',
+      summary: 'Summary unavailable for this dataset.',
+    };
   }
 }

@@ -24,7 +24,9 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
     {"name": "Series Name", "data": [num1, num2, ...]}
   ],
   "suggestedTitle": "A title for the chart",
-  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter" | "table"
+  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter" | "table",
+  "xAxisLabel": "Label for the x-axis (if visible)",
+  "yAxisLabel": "Label for the y-axis (if visible)"
 }
 
 Rules:
@@ -78,6 +80,8 @@ Rules:
     sourceType: 'image',
     suggestedTitle: parsed.suggestedTitle,
     suggestedType: parsed.suggestedType,
+    xAxisLabel: parsed.xAxisLabel,
+    yAxisLabel: parsed.yAxisLabel,
   };
 }
 

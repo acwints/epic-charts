@@ -114,6 +114,16 @@ export function ChartControls({ config, onChange, data }: ChartControlsProps) {
         )}
       </div>
 
+      {data.aiSummary && (
+        <div className="control-section ai-summary">
+          <label className="control-label">
+            <Sparkles size={14} />
+            <span>AI Summary</span>
+          </label>
+          <div className="ai-summary-text">{data.aiSummary}</div>
+        </div>
+      )}
+
       <div className="control-section">
         <label className="control-label">
           <Paintbrush size={14} />

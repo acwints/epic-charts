@@ -76,6 +76,15 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
     });
   }, [data]);
 
+  const xAxisLabel = data.xAxisLabel;
+  const yAxisLabel = data.yAxisLabel ?? (data.series.length === 1 ? data.series[0].name : undefined);
+  const chartMargins = {
+    top: 10,
+    right: 20,
+    bottom: xAxisLabel ? 36 : 20,
+    left: yAxisLabel ? 48 : 32,
+  };
+
   const pieData = useMemo(() => {
     if (config.type !== 'pie') return [];
     return data.series[0].data.map((value, idx) => ({
@@ -199,6 +208,7 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
   const renderChart = () => {
     const commonProps = {
       data: chartData,
+      margin: chartMargins,
     };
 
     const showGrid = config.showGrid && styleConfig.chart.gridStyle !== 'none';
@@ -218,6 +228,13 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
         tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
         tickLine={{ stroke: 'var(--text-muted)' }}
         axisLine={{ stroke: 'var(--border-default)', strokeOpacity: 0.5 }}
+        label={xAxisLabel ? {
+          value: xAxisLabel,
+          position: 'insideBottom',
+          offset: -10,
+          fill: 'var(--text-muted)',
+          fontSize: 12,
+        } : undefined}
       />
     );
 
@@ -227,6 +244,14 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
         tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
         tickLine={{ stroke: 'var(--text-muted)' }}
         axisLine={{ stroke: 'var(--border-default)', strokeOpacity: 0.5 }}
+        label={yAxisLabel ? {
+          value: yAxisLabel,
+          angle: -90,
+          position: 'insideLeft',
+          offset: 12,
+          fill: 'var(--text-muted)',
+          fontSize: 12,
+        } : undefined}
       />
     );
 

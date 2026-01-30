@@ -59,18 +59,19 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
       return null;
     }
 
-    const headers = rows[0].map(String);
+    const headers = rows[0].map((header) => String(header).trim());
     const labels = rows.slice(1).map(row => String(row[0]));
+    const xAxisLabel = headers[0] || undefined;
 
     const series = headers.slice(1).map((name, colIndex) => ({
-      name,
+      name: name || `Series ${colIndex + 1}`,
       data: rows.slice(1).map(row => {
         const val = row[colIndex + 1];
         return typeof val === 'number' ? val : parseFloat(String(val)) || 0;
       }),
     }));
 
-    return { labels, series, sourceType };
+    return { labels, series, sourceType, xAxisLabel };
   }, []);
 
   const handleFileUpload = useCallback((file: File) => {
