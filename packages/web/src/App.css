@@ -8,10 +8,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--space-4) calc(var(--space-6) + 320px) var(--space-4) var(--space-6);
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
+  overflow: hidden;
 }
 
 .input-view {
@@ -19,7 +16,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  padding-top: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .chart-view {
@@ -27,7 +27,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
   min-height: 0;
+}
+
+/* Chart view with assistant panel - full width flex layout */
+.chart-view.with-assistant {
+  flex-direction: row;
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  gap: 0;
+  margin: 0;
+}
+
+.chart-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-6);
+  overflow-y: auto;
+  min-width: 0;
 }
 
 .chart-toolbar {
@@ -98,8 +121,13 @@
     min-height: auto;
   }
 
-  .main {
-    padding-right: var(--space-6);
+  .chart-view.with-assistant {
+    flex-direction: column;
+  }
+
+  .chart-main-area {
+    flex: none;
+    height: auto;
   }
 }
 

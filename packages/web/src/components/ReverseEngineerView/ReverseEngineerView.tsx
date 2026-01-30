@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ChartPreview } from '../ChartPreview';
 import { ChartControls } from '../ChartControls';
-import { ChatPanel, ChatToggleButton } from '../ChatPanel';
+import { ChatPanel } from '../ChatPanel';
 import { EditableSpreadsheet } from '../EditableSpreadsheet/EditableSpreadsheet';
 import type { ChartData, ChartConfig, EditableChartState } from '../../types';
 import './ReverseEngineerView.css';
@@ -25,7 +25,6 @@ export function ReverseEngineerView({
     current: initialData,
     isDirty: false,
   });
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleDataChange = useCallback((newData: ChartData) => {
     setEditableState((prev) => ({
@@ -45,54 +44,48 @@ export function ReverseEngineerView({
 
   return (
     <motion.div
-      className="reverse-engineer-view"
+      className="reverse-engineer-view with-assistant"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="re-toolbar">
-        <ChatToggleButton
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          isOpen={isChatOpen}
-        />
-      </div>
-
-      <div className={`re-workspace ${isChatOpen ? 'with-chat' : ''}`}>
-        <div className="re-chart-area" ref={chartRef}>
-          {editableState.current.aiSummary && (
-            <div className="chart-ai-summary">
-              <span className="chart-ai-label">AI Insight</span>
-              <p className="chart-ai-text">{editableState.current.aiSummary}</p>
-            </div>
-          )}
-          <ChartPreview data={editableState.current} config={config} />
+      <div className="re-main-content">
+        <div className="re-workspace">
+          <div className="re-chart-area" ref={chartRef}>
+            {editableState.current.aiSummary && (
+              <div className="chart-ai-summary">
+                <span className="chart-ai-label">AI Insight</span>
+                <p className="chart-ai-text">{editableState.current.aiSummary}</p>
+              </div>
+            )}
+            <ChartPreview data={editableState.current} config={config} />
+          </div>
+          <div className="re-controls-area">
+            <ChartControls
+              config={config}
+              onChange={onConfigChange}
+              data={editableState.current}
+            />
+          </div>
         </div>
-        <div className="re-controls-area">
-          <ChartControls
-            config={config}
-            onChange={onConfigChange}
+
+        <div className="re-data-area">
+          <EditableSpreadsheet
             data={editableState.current}
+            colorScheme={config.colorScheme}
+            isDirty={editableState.isDirty}
+            onChange={handleDataChange}
+            onReset={handleReset}
           />
         </div>
-        <ChatPanel
-          data={editableState.current}
-          config={config}
-          onDataChange={handleDataChange}
-          onConfigChange={onConfigChange}
-          isOpen={isChatOpen}
-          onToggle={() => setIsChatOpen(!isChatOpen)}
-        />
       </div>
 
-      <div className="re-data-area">
-        <EditableSpreadsheet
-          data={editableState.current}
-          colorScheme={config.colorScheme}
-          isDirty={editableState.isDirty}
-          onChange={handleDataChange}
-          onReset={handleReset}
-        />
-      </div>
+      <ChatPanel
+        data={editableState.current}
+        config={config}
+        onDataChange={handleDataChange}
+        onConfigChange={onConfigChange}
+      />
     </motion.div>
   );
 }

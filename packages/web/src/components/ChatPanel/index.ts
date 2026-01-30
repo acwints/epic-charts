@@ -1,1 +1,1 @@
-export { ChatPanel, ChatToggleButton } from './ChatPanel';
+export { ChatPanel } from './ChatPanel';

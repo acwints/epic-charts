@@ -6,6 +6,22 @@
   min-height: 0;
 }
 
+/* With assistant panel - full width flex layout */
+.reverse-engineer-view.with-assistant {
+  flex-direction: row;
+  gap: 0;
+}
+
+.re-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+  overflow-y: auto;
+  min-width: 0;
+}
+
 .re-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -16,7 +32,6 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: var(--space-4);
-  flex: 1;
   min-height: 0;
   height: clamp(280px, 38vh, 420px);
 }
@@ -40,6 +55,15 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .reverse-engineer-view.with-assistant {
+    flex-direction: column;
+  }
+
+  .re-main-content {
+    flex: none;
+    height: auto;
+  }
+
   .re-workspace {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;

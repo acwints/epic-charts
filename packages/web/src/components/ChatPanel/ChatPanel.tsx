@@ -1,14 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Send,
   Sparkles,
   Loader2,
+  RotateCcw,
+  PanelRightClose,
   Database,
   Settings,
-  X,
-  MessageSquare,
   Lightbulb,
+  CheckCircle,
 } from 'lucide-react';
 import type { ChartData, ChartConfig } from '../../types';
 import {
@@ -16,6 +17,7 @@ import {
   generateMessageId,
   type ChatMessage,
 } from '../../services/chartChatService';
+import { useAssistant } from '../../contexts/AssistantProvider';
 import './ChatPanel.css';
 
 interface ChatPanelProps {
@@ -23,8 +25,6 @@ interface ChatPanelProps {
   config: ChartConfig;
   onDataChange: (data: ChartData) => void;
   onConfigChange: (config: ChartConfig) => void;
-  isOpen: boolean;
-  onToggle: () => void;
 }
 
 export function ChatPanel({
@@ -32,29 +32,25 @@ export function ChatPanel({
   config,
   onDataChange,
   onConfigChange,
-  isOpen,
-  onToggle,
 }: ChatPanelProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: "Hi! I can help you understand and refine your data. Ask me questions like \"What's the highest value?\" or \"Which category is performing best?\" - or ask me to modify the chart by adding columns, changing colors, or computing totals.",
-      timestamp: new Date(),
-    },
-  ]);
+  const { isOpen, open, close } = useAssistant();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, []);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
 
@@ -80,12 +76,10 @@ export function ChatPanel({
         messages
       );
 
-      // Apply data changes if any
       if (response.updatedData) {
         onDataChange(response.updatedData);
       }
 
-      // Apply config changes if any
       if (response.updatedConfig) {
         onConfigChange({ ...config, ...response.updatedConfig });
       }
@@ -123,31 +117,99 @@ export function ChatPanel({
     }
   };
 
-  return (
-    <div className={`chat-panel ${isOpen ? 'is-open' : 'is-collapsed'}`}>
-      <div className="chat-header">
-        <div className="chat-header-title">
-          <Sparkles size={16} />
-          <span>AI Assistant</span>
-        </div>
-        <button className="chat-toggle" onClick={onToggle} aria-label={isOpen ? 'Minimize chat' : 'Open chat'}>
-          {isOpen ? <X size={18} /> : <MessageSquare size={18} />}
+  const handleClearConversation = () => {
+    setMessages([]);
+  };
+
+  const suggestions = [
+    "What's the highest value in the data?",
+    "Add a Total column",
+    "Summarize this data",
+    "Which category is performing best?",
+  ];
+
+  // Collapsed state - thin sidebar with open button
+  if (!isOpen) {
+    return (
+      <div className="assistant-panel collapsed">
+        <button
+          className="assistant-open-btn"
+          onClick={open}
+          title="Open Assistant"
+        >
+          <Sparkles size={20} />
         </button>
       </div>
+    );
+  }
 
-      <div className="chat-body">
-        <div className="chat-messages">
-          {messages.map((message) => (
-            <motion.div
-              key={message.id}
-              className={`chat-message ${message.role}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="message-content">{message.content}</div>
+  return (
+    <div className="assistant-panel">
+      {/* Header */}
+      <div className="assistant-header">
+        <div className="assistant-header-title">
+          <div className="assistant-icon-wrapper">
+            <Sparkles size={16} />
+          </div>
+          <span>Epic Assistant</span>
+        </div>
+        <div className="assistant-header-actions">
+          <button
+            className="assistant-header-btn"
+            onClick={handleClearConversation}
+            title="Clear conversation"
+          >
+            <RotateCcw size={16} />
+          </button>
+          <button
+            className="assistant-header-btn"
+            onClick={close}
+            title="Close panel"
+          >
+            <PanelRightClose size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="assistant-messages">
+        {messages.length === 0 && (
+          <div className="assistant-empty-state">
+            <div className="assistant-empty-icon">
+              <Sparkles size={24} />
+            </div>
+            <h4>How can I help?</h4>
+            <p>
+              I can analyze your data, add computed columns, change chart settings, and more.
+            </p>
+            <div className="assistant-suggestions">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  onClick={() => setInput(suggestion)}
+                  className="assistant-suggestion-card"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`assistant-message ${message.role}`}
+          >
+            {message.role === 'assistant' && (
+              <div className="assistant-avatar">
+                <Sparkles size={14} />
+              </div>
+            )}
+            <div className="assistant-message-bubble">
+              {/* Change badges */}
               {message.changes && (
-                <div className="message-changes">
+                <div className="assistant-changes">
                   {!message.changes.dataModified && !message.changes.configModified && message.changes.summary === 'insight' && (
                     <span className="change-badge insight">
                       <Lightbulb size={10} />
@@ -157,88 +219,85 @@ export function ChatPanel({
                   {message.changes.dataModified && (
                     <span className="change-badge data">
                       <Database size={10} />
+                      <CheckCircle size={10} />
                       Data modified
                     </span>
                   )}
                   {message.changes.configModified && (
                     <span className="change-badge config">
                       <Settings size={10} />
+                      <CheckCircle size={10} />
                       Settings changed
                     </span>
                   )}
                 </div>
               )}
-            </motion.div>
-          ))}
-          {isLoading && (
-            <motion.div
-              className="chat-message assistant loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+
+              {/* Message content with markdown */}
+              <div className="assistant-message-content">
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </div>
+
+              {/* Timestamp */}
+              <div className="assistant-timestamp">
+                {message.timestamp.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </div>
+            </div>
+            {message.role === 'user' && (
+              <div className="user-avatar">
+                U
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="assistant-message assistant">
+            <div className="assistant-avatar">
+              <Sparkles size={14} />
+            </div>
+            <div className="assistant-message-bubble loading">
               <Loader2 size={16} className="spin" />
               <span>Thinking...</span>
-            </motion.div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            </div>
+          </div>
+        )}
 
-        <div className="chat-input-container">
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="assistant-input-area">
+        <div className="assistant-input-row">
           <textarea
             ref={inputRef}
-            className="chat-input"
-            placeholder="Ask me to modify your chart..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            placeholder="Ask me anything..."
+            className="assistant-input"
             rows={1}
             disabled={isLoading}
           />
           <button
-            className="chat-send"
             onClick={handleSubmit}
             disabled={!input.trim() || isLoading}
+            className="assistant-send-btn"
           >
-            {isLoading ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
+            {isLoading ? (
+              <Loader2 size={18} className="spin" />
+            ) : (
+              <Send size={18} />
+            )}
           </button>
         </div>
-
-        <div className="chat-suggestions">
-          <span className="suggestions-label">Try:</span>
-          <button
-            className="suggestion-chip"
-            onClick={() => setInput("What's the highest value in the data?")}
-          >
-            Highest value?
-          </button>
-          <button
-            className="suggestion-chip"
-            onClick={() => setInput('Add a Total column')}
-          >
-            Add totals
-          </button>
-          <button
-            className="suggestion-chip"
-            onClick={() => setInput('Summarize this data')}
-          >
-            Summarize
-          </button>
-        </div>
+        <p className="assistant-input-hint">
+          Press Enter to send
+        </p>
       </div>
     </div>
-  );
-}
-
-export function ChatToggleButton({ onClick, isOpen }: { onClick: () => void; isOpen: boolean }) {
-  return (
-    <motion.button
-      className={`chat-toggle-button ${isOpen ? 'active' : ''}`}
-      onClick={onClick}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-    >
-      <MessageSquare size={18} />
-      <span>AI Chat</span>
-    </motion.button>
   );
 }
