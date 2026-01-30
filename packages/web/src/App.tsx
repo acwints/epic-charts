@@ -150,15 +150,15 @@ function App() {
                     data={chartData}
                   />
                 </div>
-                <ChatPanel
-                  data={chartData}
-                  config={chartConfig}
-                  onDataChange={setChartData}
-                  onConfigChange={setChartConfig}
-                  isOpen={isChatOpen}
-                  onClose={() => setIsChatOpen(false)}
-                />
               </div>
+              <ChatPanel
+                data={chartData}
+                config={chartConfig}
+                onDataChange={setChartData}
+                onConfigChange={setChartConfig}
+                isOpen={isChatOpen}
+                onToggle={() => setIsChatOpen(!isChatOpen)}
+              />
             </motion.div>
           )}
         </AnimatePresence>

@@ -80,7 +80,7 @@ export function ReverseEngineerView({
           onDataChange={handleDataChange}
           onConfigChange={onConfigChange}
           isOpen={isChatOpen}
-          onClose={() => setIsChatOpen(false)}
+          onToggle={() => setIsChatOpen(!isChatOpen)}
         />
       </div>
 

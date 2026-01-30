@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   Send,
   Sparkles,
@@ -24,7 +24,7 @@ interface ChatPanelProps {
   onDataChange: (data: ChartData) => void;
   onConfigChange: (config: ChartConfig) => void;
   isOpen: boolean;
-  onClose: () => void;
+  onToggle: () => void;
 }
 
 export function ChatPanel({
@@ -33,7 +33,7 @@ export function ChatPanel({
   onDataChange,
   onConfigChange,
   isOpen,
-  onClose,
+  onToggle,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -124,116 +124,108 @@ export function ChatPanel({
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="chat-panel"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="chat-header">
-            <div className="chat-header-title">
-              <Sparkles size={16} />
-              <span>AI Assistant</span>
-            </div>
-            <button className="chat-close" onClick={onClose}>
-              <X size={18} />
-            </button>
-          </div>
+    <div className={`chat-panel ${isOpen ? 'is-open' : 'is-collapsed'}`}>
+      <div className="chat-header">
+        <div className="chat-header-title">
+          <Sparkles size={16} />
+          <span>AI Assistant</span>
+        </div>
+        <button className="chat-toggle" onClick={onToggle} aria-label={isOpen ? 'Minimize chat' : 'Open chat'}>
+          {isOpen ? <X size={18} /> : <MessageSquare size={18} />}
+        </button>
+      </div>
 
-          <div className="chat-messages">
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                className={`chat-message ${message.role}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="message-content">{message.content}</div>
-                {message.changes && (
-                  <div className="message-changes">
-                    {!message.changes.dataModified && !message.changes.configModified && message.changes.summary === 'insight' && (
-                      <span className="change-badge insight">
-                        <Lightbulb size={10} />
-                        Insight
-                      </span>
-                    )}
-                    {message.changes.dataModified && (
-                      <span className="change-badge data">
-                        <Database size={10} />
-                        Data modified
-                      </span>
-                    )}
-                    {message.changes.configModified && (
-                      <span className="change-badge config">
-                        <Settings size={10} />
-                        Settings changed
-                      </span>
-                    )}
-                  </div>
-                )}
-              </motion.div>
-            ))}
-            {isLoading && (
-              <motion.div
-                className="chat-message assistant loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <Loader2 size={16} className="spin" />
-                <span>Thinking...</span>
-              </motion.div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+      <div className="chat-body">
+        <div className="chat-messages">
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              className={`chat-message ${message.role}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="message-content">{message.content}</div>
+              {message.changes && (
+                <div className="message-changes">
+                  {!message.changes.dataModified && !message.changes.configModified && message.changes.summary === 'insight' && (
+                    <span className="change-badge insight">
+                      <Lightbulb size={10} />
+                      Insight
+                    </span>
+                  )}
+                  {message.changes.dataModified && (
+                    <span className="change-badge data">
+                      <Database size={10} />
+                      Data modified
+                    </span>
+                  )}
+                  {message.changes.configModified && (
+                    <span className="change-badge config">
+                      <Settings size={10} />
+                      Settings changed
+                    </span>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          ))}
+          {isLoading && (
+            <motion.div
+              className="chat-message assistant loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Loader2 size={16} className="spin" />
+              <span>Thinking...</span>
+            </motion.div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
 
-          <div className="chat-input-container">
-            <textarea
-              ref={inputRef}
-              className="chat-input"
-              placeholder="Ask me to modify your chart..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={1}
-              disabled={isLoading}
-            />
-            <button
-              className="chat-send"
-              onClick={handleSubmit}
-              disabled={!input.trim() || isLoading}
-            >
-              {isLoading ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
-            </button>
-          </div>
+        <div className="chat-input-container">
+          <textarea
+            ref={inputRef}
+            className="chat-input"
+            placeholder="Ask me to modify your chart..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            disabled={isLoading}
+          />
+          <button
+            className="chat-send"
+            onClick={handleSubmit}
+            disabled={!input.trim() || isLoading}
+          >
+            {isLoading ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
+          </button>
+        </div>
 
-          <div className="chat-suggestions">
-            <span className="suggestions-label">Try:</span>
-            <button
-              className="suggestion-chip"
-              onClick={() => setInput("What's the highest value in the data?")}
-            >
-              Highest value?
-            </button>
-            <button
-              className="suggestion-chip"
-              onClick={() => setInput('Add a Total column')}
-            >
-              Add totals
-            </button>
-            <button
-              className="suggestion-chip"
-              onClick={() => setInput('Summarize this data')}
-            >
-              Summarize
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        <div className="chat-suggestions">
+          <span className="suggestions-label">Try:</span>
+          <button
+            className="suggestion-chip"
+            onClick={() => setInput("What's the highest value in the data?")}
+          >
+            Highest value?
+          </button>
+          <button
+            className="suggestion-chip"
+            onClick={() => setInput('Add a Total column')}
+          >
+            Add totals
+          </button>
+          <button
+            className="suggestion-chip"
+            onClick={() => setInput('Summarize this data')}
+          >
+            Summarize
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
