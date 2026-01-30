@@ -1,3 +1,3 @@
-export * from './types';
-export * from './colors';
-export * from './styleVariants';
+export * from './types.js';
+export * from './colors.js';
+export * from './styleVariants.js';

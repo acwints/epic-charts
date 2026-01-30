@@ -1,4 +1,4 @@
-import type { ColorScheme } from './types';
+import type { ColorScheme } from './types.js';
 
 export const COLOR_PALETTES: Record<ColorScheme, string[]> = {
   default: ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'],

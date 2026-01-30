@@ -1,4 +1,4 @@
-import type { StyleVariant } from './types';
+import type { StyleVariant } from './types.js';
 
 export interface StyleVariantConfig {
   id: StyleVariant;
