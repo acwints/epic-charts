@@ -157,6 +157,17 @@
   font-weight: 500;
 }
 
+.series-header .editable-cell {
+  align-items: flex-start;
+}
+
+.series-header .cell-value {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.2;
+}
+
 .cell-value {
   padding: var(--space-2) var(--space-3);
   width: 100%;

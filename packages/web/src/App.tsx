@@ -134,7 +134,15 @@ function App() {
                 />
               </div>
               <div className={`chart-workspace ${isChatOpen ? 'with-chat' : ''}`} ref={chartRef}>
-                <ChartPreview data={chartData} config={chartConfig} />
+                <div className="chart-column">
+                  {chartData.aiSummary && (
+                    <div className="chart-ai-summary">
+                      <span className="chart-ai-label">AI Summary</span>
+                      <p className="chart-ai-text">{chartData.aiSummary}</p>
+                    </div>
+                  )}
+                  <ChartPreview data={chartData} config={chartConfig} />
+                </div>
                 <div className="chart-sidebar">
                   <ChartControls
                     config={chartConfig}

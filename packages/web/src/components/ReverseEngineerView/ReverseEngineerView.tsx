@@ -59,6 +59,12 @@ export function ReverseEngineerView({
 
       <div className={`re-workspace ${isChatOpen ? 'with-chat' : ''}`}>
         <div className="re-chart-area" ref={chartRef}>
+          {editableState.current.aiSummary && (
+            <div className="chart-ai-summary">
+              <span className="chart-ai-label">AI Summary</span>
+              <p className="chart-ai-text">{editableState.current.aiSummary}</p>
+            </div>
+          )}
           <ChartPreview data={editableState.current} config={config} />
         </div>
         <div className="re-controls-area">

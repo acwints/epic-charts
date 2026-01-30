@@ -18,6 +18,7 @@
   gap: var(--space-4);
   flex: 1;
   min-height: 0;
+  height: clamp(360px, 52vh, 520px);
 }
 
 .re-workspace.with-chat {
@@ -28,6 +29,7 @@
 .re-chart-area {
   display: flex;
   flex-direction: column;
+  gap: var(--space-3);
   min-height: 0;
 }
 
@@ -75,6 +77,7 @@
   .re-workspace {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
+    height: auto;
   }
 
   .re-workspace.with-chat {
