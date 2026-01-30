@@ -63,7 +63,7 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: var(--space-4);
-  height: clamp(280px, 38vh, 420px);
+  height: clamp(360px, 70vh, 600px);
   min-height: 0;
   align-items: stretch;
 }
