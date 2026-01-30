@@ -7,7 +7,7 @@
     "dev": "pnpm --filter @epic-charts/web dev",
     "dev:bot": "pnpm --filter @epic-charts/bot dev",
     "build": "pnpm -r build",
-    "build:web": "pnpm --filter @epic-charts/web build",
+    "build:web": "pnpm --filter @epic-charts/shared build && pnpm --filter @epic-charts/web build",
     "build:bot": "pnpm --filter @epic-charts/bot build",
     "lint": "pnpm -r lint",
     "preview": "pnpm --filter @epic-charts/web preview"
