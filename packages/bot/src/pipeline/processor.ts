@@ -74,7 +74,9 @@ export async function processMention(mention: MentionData): Promise<void> {
 
     logger.info({ mentionId }, 'Successfully processed mention and posted reply');
   } catch (error) {
-    logger.error({ error, mentionId }, 'Error processing mention');
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    logger.error({ mentionId, errorMessage, errorStack }, 'Error processing mention');
 
     // Determine if we should reply with an error
     if (error instanceof Error) {
