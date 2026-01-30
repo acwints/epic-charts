@@ -61,7 +61,7 @@ export function ReverseEngineerView({
         <div className="re-chart-area" ref={chartRef}>
           {editableState.current.aiSummary && (
             <div className="chart-ai-summary">
-              <span className="chart-ai-label">AI Summary</span>
+              <span className="chart-ai-label">AI Insight</span>
               <p className="chart-ai-text">{editableState.current.aiSummary}</p>
             </div>
           )}

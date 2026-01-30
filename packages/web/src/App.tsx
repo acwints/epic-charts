@@ -137,7 +137,7 @@ function App() {
                 <div className="chart-column">
                   {chartData.aiSummary && (
                     <div className="chart-ai-summary">
-                      <span className="chart-ai-label">AI Summary</span>
+                      <span className="chart-ai-label">AI Insight</span>
                       <p className="chart-ai-text">{chartData.aiSummary}</p>
                     </div>
                   )}

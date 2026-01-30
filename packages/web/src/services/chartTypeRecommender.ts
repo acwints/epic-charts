@@ -30,7 +30,7 @@ export async function recommendChartType(
     ? `Preferred chart type: ${options.preferredType} (use this type and justify it)`
     : 'No preferred chart type provided';
 
-  const prompt = `You are a data visualization expert. Analyze the provided data and recommend the best chart type. Consider:
+  const prompt = `You are a data visualization expert and analyst. Analyze the provided data and recommend the best chart type. Consider:
 - Data relationships and patterns
 - Number of data points and series
 - Whether labels are categorical, temporal, or ordinal
@@ -44,7 +44,7 @@ Respond with JSON only (no markdown):
 {
   "type": "chartType",
   "reasoning": "A clear 1-2 sentence explanation of why this chart type is best for this data",
-  "summary": "A 1-2 sentence plain-English description of the data's key pattern"
+  "summary": "3-5 sentences that: (1) highlight the most interesting pattern, (2) explain why it matters, (3) note any bias or potential chart crime, and (4) state what the data does not answer"
 }
 
 Analyze this data and recommend the best chart type:
