@@ -233,7 +233,8 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
           position: 'insideBottom',
           offset: -10,
           fill: 'var(--text-muted)',
-          fontSize: 12,
+          fontSize: 11,
+          fontFamily: 'var(--font-mono)',
         } : undefined}
       />
     );
@@ -250,7 +251,8 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
           position: 'insideLeft',
           offset: 12,
           fill: 'var(--text-muted)',
-          fontSize: 12,
+          fontSize: 11,
+          fontFamily: 'var(--font-mono)',
         } : undefined}
       />
     );
@@ -484,7 +486,9 @@ export function ChartPreview({ data, config }: ChartPreviewProps) {
         </div>
       </div>
 
-      <div className="chart-container">
+      <div
+        className={`chart-container ${config.type === 'table' ? 'chart-container--scroll' : 'chart-container--no-scroll'}`}
+      >
         {config.type === 'table' ? (
           renderTable()
         ) : config.type === 'infographic' ? (
