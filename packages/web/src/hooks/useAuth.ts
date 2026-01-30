@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCurrentUser, setAuthCookie, logout as apiLogout, getAuthUrl, User } from '../services/api';
+import { getCurrentUser, setAuthCookie, logout as apiLogout, getAuthUrl } from '../services/api';
+import type { User } from '../services/api';
 
 interface AuthState {
   user: User | null;
