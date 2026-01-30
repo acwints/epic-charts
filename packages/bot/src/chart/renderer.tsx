@@ -32,18 +32,53 @@ let browser: Browser | null = null;
 
 async function getBrowser(): Promise<Browser> {
   if (!browser) {
+    // Try to find chromium in common locations
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH ||
+      (await findChromium());
+
     browser = await puppeteer.launch({
       headless: true,
+      executablePath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
+        '--single-process',
       ],
     });
-    logger.info('Puppeteer browser launched');
+    logger.info('Puppeteer browser launched', { executablePath });
   }
   return browser;
+}
+
+async function findChromium(): Promise<string | undefined> {
+  const { execSync } = await import('child_process');
+  const paths = [
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+  ];
+
+  for (const p of paths) {
+    try {
+      execSync(`test -x ${p}`);
+      return p;
+    } catch {
+      continue;
+    }
+  }
+
+  // Try which
+  try {
+    const result = execSync('which chromium || which chromium-browser || which google-chrome').toString().trim();
+    if (result) return result;
+  } catch {
+    // Ignore
+  }
+
+  return undefined;
 }
 
 export async function closeBrowser(): Promise<void> {

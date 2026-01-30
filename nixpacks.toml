@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["chromium"]
+
+[phases.install]
+cmds = ["npm install -g pnpm", "pnpm install"]
+
+[phases.build]
+cmds = ["pnpm --filter @epic-charts/shared build", "pnpm --filter @epic-charts/bot build"]
+
+[start]
+cmd = "node packages/bot/dist/index.js"
+
+[variables]
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
