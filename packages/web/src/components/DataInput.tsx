@@ -273,7 +273,10 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
                 disabled={isProcessing || !pasteContent.trim()}
               >
                 {isProcessing ? (
-                  <Loader2 size={18} className="spin" />
+                  <>
+                    <Sparkles size={18} className="pulse" />
+                    <span>AI selecting best chart...</span>
+                  </>
                 ) : (
                   <>
                     <span>Generate Chart</span>
@@ -305,7 +308,10 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
                 disabled={isProcessing || !sheetsUrl.trim()}
               >
                 {isProcessing ? (
-                  <Loader2 size={18} className="spin" />
+                  <>
+                    <Sparkles size={18} className="pulse" />
+                    <span>AI selecting best chart...</span>
+                  </>
                 ) : (
                   <>
                     <span>Import & Generate</span>

@@ -26,20 +26,65 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chart-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
 }
 
 .chart-workspace {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: var(--space-6);
-  flex: 1;
-  min-height: 0;
+  gap: var(--space-4);
+  height: calc(100vh - 220px);
+  min-height: 500px;
+  align-items: stretch;
+}
+
+.chart-workspace.with-chat {
+  grid-template-columns: 1fr 320px 380px;
+}
+
+.chart-sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (max-width: 1400px) {
+  .chart-workspace.with-chat {
+    grid-template-columns: 1fr 300px 340px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .chart-workspace.with-chat {
+    grid-template-columns: 1fr 380px;
+  }
+
+  .chart-workspace.with-chat .chart-sidebar {
+    display: none;
+  }
 }
 
 @media (max-width: 1024px) {
   .chart-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto auto;
+    height: auto;
+    min-height: auto;
+  }
+
+  .chart-workspace.with-chat {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .chart-workspace.with-chat .chart-sidebar {
+    display: flex;
   }
 }
 

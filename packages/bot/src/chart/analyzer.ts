@@ -1,32 +1,33 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { ChartData } from '@epic-charts/shared';
 import { config, logger } from '../config.js';
 
-let openaiClient: OpenAI | null = null;
+let genAI: GoogleGenerativeAI | null = null;
 
-function getOpenAIClient(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: config.openai.apiKey,
-    });
+function getGeminiClient(): GoogleGenerativeAI {
+  if (!genAI) {
+    genAI = new GoogleGenerativeAI(config.google.apiKey);
   }
-  return openaiClient;
+  return genAI;
 }
 
 export async function analyzeImageFromUrl(imageUrl: string): Promise<ChartData> {
-  const client = getOpenAIClient();
+  logger.info({ imageUrl }, 'Analyzing image with Gemini Vision');
 
-  logger.info({ imageUrl }, 'Analyzing image with GPT-4o Vision');
+  // Fetch the image and convert to base64
+  const response = await fetch(imageUrl);
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
-  const response = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `Analyze this image and extract any data that could be turned into a chart.
+  return analyzeImageFromBuffer(buffer);
+}
+
+export async function analyzeImageFromBuffer(imageBuffer: Buffer): Promise<ChartData> {
+  const client = getGeminiClient();
+  const base64 = imageBuffer.toString('base64');
+  const mimeType = detectMimeType(imageBuffer);
+
+  const prompt = `Analyze this image and extract any data that could be turned into a chart.
 
 Look for:
 - Tables, leaderboards, rankings
@@ -41,29 +42,31 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
     {"name": "Series Name", "data": [num1, num2, ...]}
   ],
   "suggestedTitle": "A title for the chart",
-  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter"
+  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter" | "table"
 }
 
 Rules:
 - labels array must match the length of each data array
 - All data values must be numbers (convert scores like "-27" to -27)
 - If there are multiple numeric columns, create multiple series
-- Choose suggestedType based on the data (rankings = bar, trends = line, etc.)
-- If you can't find chartable data, return: {"error": "No chartable data found"}`,
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: imageUrl,
-            },
-          },
-        ],
-      },
-    ],
-    max_tokens: 1000,
-  });
+- Choose suggestedType based on the data (rankings = table, trends = line, comparisons = bar, etc.)
+- If you can't find chartable data, return: {"error": "No chartable data found"}`;
 
-  const content = response.choices[0]?.message?.content;
+  const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+  const result = await model.generateContent([
+    prompt,
+    {
+      inlineData: {
+        mimeType,
+        data: base64,
+      },
+    },
+  ]);
+
+  const geminiResponse = await result.response;
+  const content = geminiResponse.text();
+
   if (!content) {
     throw new Error('No response from vision API');
   }
@@ -75,7 +78,7 @@ Rules:
     const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
     parsed = JSON.parse(cleanContent);
   } catch {
-    logger.error({ content }, 'Failed to parse GPT response');
+    logger.error({ content }, 'Failed to parse Gemini response');
     throw new Error('Failed to parse response: ' + content);
   }
 
@@ -100,14 +103,6 @@ Rules:
     suggestedTitle: parsed.suggestedTitle,
     suggestedType: parsed.suggestedType,
   };
-}
-
-export async function analyzeImageFromBuffer(imageBuffer: Buffer): Promise<ChartData> {
-  const base64 = imageBuffer.toString('base64');
-  const mimeType = detectMimeType(imageBuffer);
-  const dataUrl = `data:${mimeType};base64,${base64}`;
-
-  return analyzeImageFromUrl(dataUrl);
 }
 
 function detectMimeType(buffer: Buffer): string {

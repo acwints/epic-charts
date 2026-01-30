@@ -9,6 +9,7 @@ export interface ChartData {
   sourceType: 'csv' | 'paste' | 'image' | 'sheets';
   suggestedTitle?: string;
   suggestedType?: ChartType;
+  aiReasoning?: string;
 }
 
 export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'radar' | 'scatter' | 'table' | 'infographic';

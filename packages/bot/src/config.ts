@@ -13,8 +13,8 @@ export const config = {
     allowedUserIds: (process.env.ALLOWED_USER_IDS || '').split(',').filter(Boolean),
     pollIntervalMs: parseInt(process.env.POLL_INTERVAL_MS || '60000', 10),
   },
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY || '',
+  google: {
+    apiKey: process.env.GOOGLE_API_KEY || '',
   },
 };
 
@@ -25,7 +25,7 @@ export function validateConfig(): void {
     ['TWITTER_ACCESS_TOKEN', config.twitter.accessToken],
     ['TWITTER_ACCESS_SECRET', config.twitter.accessSecret],
     ['BOT_USER_ID', config.bot.userId],
-    ['OPENAI_API_KEY', config.openai.apiKey],
+    ['GOOGLE_API_KEY', config.google.apiKey],
   ];
 
   const missing = required.filter(([, value]) => !value).map(([name]) => name);

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ChartPreview } from '../ChartPreview';
 import { ChartControls } from '../ChartControls';
+import { ChatPanel, ChatToggleButton } from '../ChatPanel';
 import { EditableSpreadsheet } from '../EditableSpreadsheet/EditableSpreadsheet';
 import type { ChartData, ChartConfig, EditableChartState } from '../../types';
 import './ReverseEngineerView.css';
@@ -24,6 +25,7 @@ export function ReverseEngineerView({
     current: initialData,
     isDirty: false,
   });
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleDataChange = useCallback((newData: ChartData) => {
     setEditableState((prev) => ({
@@ -48,7 +50,14 @@ export function ReverseEngineerView({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="re-workspace">
+      <div className="re-toolbar">
+        <ChatToggleButton
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          isOpen={isChatOpen}
+        />
+      </div>
+
+      <div className={`re-workspace ${isChatOpen ? 'with-chat' : ''}`}>
         <div className="re-chart-area" ref={chartRef}>
           <ChartPreview data={editableState.current} config={config} />
         </div>
@@ -59,6 +68,14 @@ export function ReverseEngineerView({
             data={editableState.current}
           />
         </div>
+        <ChatPanel
+          data={editableState.current}
+          config={config}
+          onDataChange={handleDataChange}
+          onConfigChange={onConfigChange}
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+        />
       </div>
 
       <div className="re-data-area">

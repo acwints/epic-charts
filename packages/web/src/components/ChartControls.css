@@ -5,7 +5,7 @@
   border: var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  max-height: calc(100vh - 180px);
+  height: 100%;
   overflow-y: auto;
 }
 
@@ -124,6 +124,27 @@
 .type-label {
   font-size: 0.65rem;
   font-weight: 500;
+}
+
+/* AI Reasoning */
+.ai-reasoning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(59, 130, 246, 0.08));
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.ai-reasoning svg {
+  flex-shrink: 0;
+  color: #a78bfa;
+  margin-top: 1px;
 }
 
 /* Style Variant Grid */

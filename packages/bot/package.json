@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@epic-charts/shared": "workspace:*",
-    "openai": "^4.67.0",
+    "@google/generative-ai": "^0.24.1",
     "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
     "puppeteer": "^23.0.0",

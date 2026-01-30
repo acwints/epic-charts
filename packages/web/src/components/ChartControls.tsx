@@ -106,6 +106,12 @@ export function ChartControls({ config, onChange, data }: ChartControlsProps) {
             </button>
           ))}
         </div>
+        {data.aiReasoning && (
+          <div className="ai-reasoning">
+            <Sparkles size={12} />
+            <span>{data.aiReasoning}</span>
+          </div>
+        )}
       </div>
 
       <div className="control-section">

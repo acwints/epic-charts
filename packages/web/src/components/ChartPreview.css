@@ -5,6 +5,7 @@
   border: var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  height: 100%;
   transition: box-shadow var(--transition-base), transform var(--transition-base);
 }
 
@@ -66,8 +67,9 @@
 
 .chart-container {
   flex: 1;
-  min-height: 400px;
+  min-height: 0;
   padding: var(--space-5);
+  overflow: auto;
 }
 
 /* Color bar with shimmer effect */
@@ -326,14 +328,21 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .chart-preview {
+    height: auto;
+    min-height: 400px;
+  }
+}
+
 @media (max-width: 768px) {
   .chart-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .chart-container {
-    min-height: 300px;
+  .chart-preview {
+    min-height: 350px;
   }
 }
 

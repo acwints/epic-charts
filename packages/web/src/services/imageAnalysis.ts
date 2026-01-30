@@ -1,24 +1,15 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { ChartData } from '../types';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true, // For demo purposes - in production use a backend
-});
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
 export async function analyzeImage(file: File): Promise<ChartData> {
   // Convert file to base64
   const base64 = await fileToBase64(file);
+  // Remove the data URL prefix for Gemini
+  const base64Data = base64.split(',')[1];
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `Analyze this image and extract any data that could be turned into a chart.
+  const prompt = `Analyze this image and extract any data that could be turned into a chart.
 
 Look for:
 - Tables, leaderboards, rankings
@@ -33,29 +24,31 @@ Return ONLY valid JSON in this exact format (no markdown, no explanation):
     {"name": "Series Name", "data": [num1, num2, ...]}
   ],
   "suggestedTitle": "A title for the chart",
-  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter"
+  "suggestedType": "bar" | "line" | "area" | "pie" | "radar" | "scatter" | "table"
 }
 
 Rules:
 - labels array must match the length of each data array
 - All data values must be numbers (convert scores like "-27" to -27)
 - If there are multiple numeric columns, create multiple series
-- Choose suggestedType based on the data (rankings = bar, trends = line, etc.)
-- If you can't find chartable data, return: {"error": "No chartable data found"}`,
-          },
-          {
-            type: 'image_url',
-            image_url: {
-              url: base64,
-            },
-          },
-        ],
-      },
-    ],
-    max_tokens: 1000,
-  });
+- Choose suggestedType based on the data (rankings = table, trends = line, comparisons = bar, etc.)
+- If you can't find chartable data, return: {"error": "No chartable data found"}`;
 
-  const content = response.choices[0]?.message?.content;
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+
+  const result = await model.generateContent([
+    prompt,
+    {
+      inlineData: {
+        mimeType: file.type,
+        data: base64Data,
+      },
+    },
+  ]);
+
+  const response = await result.response;
+  const content = response.text();
+
   if (!content) {
     throw new Error('No response from vision API');
   }
@@ -93,7 +86,7 @@ function fileToBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      resolve(result); // Already includes data:image/...;base64, prefix
+      resolve(result);
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
