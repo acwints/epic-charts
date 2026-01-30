@@ -40,7 +40,7 @@
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: var(--space-4);
-  height: clamp(360px, 52vh, 520px);
+  height: clamp(320px, 45vh, 480px);
   min-height: 0;
   align-items: stretch;
 }

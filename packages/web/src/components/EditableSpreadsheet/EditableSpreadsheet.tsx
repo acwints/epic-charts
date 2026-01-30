@@ -128,7 +128,9 @@ export function EditableSpreadsheet({
         <table className="spreadsheet-table">
           <thead>
             <tr>
-              <th className="spreadsheet-th corner-cell"></th>
+              <th className="spreadsheet-th corner-cell">
+                <div className="corner-header">{data.xAxisLabel || 'Label'}</div>
+              </th>
               {data.series.map((series, idx) => (
                 <th key={idx} className="spreadsheet-th series-header">
                   <div className="series-header-content">
