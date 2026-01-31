@@ -34,6 +34,13 @@
   min-height: 0;
 }
 
+.feed-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 /* Chart view with assistant panel - full width flex layout */
 .chart-view.with-assistant {
   flex-direction: row;

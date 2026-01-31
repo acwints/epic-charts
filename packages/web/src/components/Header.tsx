@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { RotateCcw, Sparkles } from 'lucide-react';
+import { RotateCcw, Sparkles, LayoutGrid } from 'lucide-react';
 import { ExportMenu } from './ExportMenu/ExportMenu';
 import { ThemeToggle } from './ThemeToggle';
 import type { ChartData } from '../types';
@@ -11,9 +11,11 @@ interface HeaderProps {
   data?: ChartData | null;
   chartRef?: React.RefObject<HTMLDivElement | null>;
   title?: string;
+  onFeedClick?: () => void;
+  showFeedButton?: boolean;
 }
 
-export function Header({ onReset, hasData, data, chartRef, title }: HeaderProps) {
+export function Header({ onReset, hasData, data, chartRef, title, onFeedClick, showFeedButton = true }: HeaderProps) {
   return (
     <header className="header">
       <div className="header-content">
@@ -37,6 +39,12 @@ export function Header({ onReset, hasData, data, chartRef, title }: HeaderProps)
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <ThemeToggle />
+          {showFeedButton && onFeedClick && (
+            <button className="nav-button" onClick={onFeedClick}>
+              <LayoutGrid size={16} />
+              <span>Feed</span>
+            </button>
+          )}
           {hasData && (
             <>
               <button className="nav-button" onClick={onReset}>
