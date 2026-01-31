@@ -1,5 +1,6 @@
 .data-input {
-  max-width: 1350px;
+  width: 100%;
+  max-width: calc(100% - var(--space-4));
   margin: 0 auto;
   display: flex;
   flex-direction: column;
