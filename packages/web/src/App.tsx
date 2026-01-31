@@ -7,10 +7,14 @@ import { ChartControls } from './components/ChartControls';
 import { ChatPanel } from './components/ChatPanel';
 import { Hero } from './components/Hero';
 import { ReverseEngineerView } from './components/ReverseEngineerView/ReverseEngineerView';
+import { ChartFeed } from './components/ChartFeed';
 import { AssistantProvider } from './contexts/AssistantProvider';
 import { recommendChartType } from './services/chartTypeRecommender';
 import type { ChartData, ChartConfig } from './types';
+import type { ChartResponse } from './services/api';
 import './App.css';
+
+type AppView = 'input' | 'chart' | 'feed';
 
 function AppContent() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
@@ -25,6 +29,7 @@ function AppContent() {
     title: '',
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentView, setCurrentView] = useState<AppView>('input');
   const chartRef = useRef<HTMLDivElement>(null);
 
   const handleDataSubmit = useCallback(async (data: ChartData) => {
@@ -49,11 +54,13 @@ function AppContent() {
         ...updates,
         type: chosenType,
       }));
+      setCurrentView('chart');
     } catch (error) {
       console.error('AI recommendation failed:', error);
       const fallbackType = data.suggestedType ?? 'table';
       setChartData(data);
       setChartConfig(prev => ({ ...prev, ...updates, type: fallbackType }));
+      setCurrentView('chart');
     } finally {
       setIsProcessing(false);
     }
@@ -71,9 +78,45 @@ function AppContent() {
       animate: true,
       title: '',
     });
+    setCurrentView('input');
+  }, []);
+
+  const handleFeedClick = useCallback(() => {
+    setCurrentView('feed');
+  }, []);
+
+  const handleFeedBack = useCallback(() => {
+    setCurrentView(chartData ? 'chart' : 'input');
+  }, [chartData]);
+
+  const handleChartSelect = useCallback((chart: ChartResponse) => {
+    const convertedData: ChartData = {
+      labels: chart.data.labels,
+      series: chart.data.series,
+      sourceType: (chart.source_type as ChartData['sourceType']) || 'paste',
+      suggestedTitle: chart.data.suggestedTitle,
+      suggestedType: chart.data.suggestedType as ChartData['suggestedType'],
+    };
+
+    setChartData(convertedData);
+    setChartConfig({
+      type: (chart.config.type as ChartConfig['type']) || 'bar',
+      colorScheme: (chart.config.colorScheme as ChartConfig['colorScheme']) || 'default',
+      styleVariant: (chart.config.styleVariant as ChartConfig['styleVariant']) || 'professional',
+      showGrid: chart.config.showGrid ?? true,
+      showLegend: chart.config.showLegend ?? true,
+      showValues: chart.config.showValues ?? false,
+      animate: chart.config.animate ?? true,
+      title: chart.config.title || chart.title || '',
+    });
+    setCurrentView('chart');
   }, []);
 
   const isImageSource = chartData?.sourceType === 'image';
+
+  const showChart = currentView === 'chart' && chartData;
+  const showFeed = currentView === 'feed';
+  const showInput = currentView === 'input' || (!chartData && !showFeed);
 
   return (
     <div className="app">
@@ -83,11 +126,27 @@ function AppContent() {
         data={chartData}
         chartRef={chartRef}
         title={chartConfig.title}
+        onFeedClick={handleFeedClick}
+        showFeedButton={!showFeed}
       />
 
       <main className="main">
         <AnimatePresence mode="wait">
-          {!chartData ? (
+          {showFeed ? (
+            <motion.div
+              key="feed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="feed-view"
+            >
+              <ChartFeed
+                onChartSelect={handleChartSelect}
+                onBack={handleFeedBack}
+              />
+            </motion.div>
+          ) : showInput ? (
             <motion.div
               key="input"
               initial={{ opacity: 0 }}
@@ -99,7 +158,7 @@ function AppContent() {
               <Hero />
               <DataInput onSubmit={handleDataSubmit} isProcessing={isProcessing} />
             </motion.div>
-          ) : isImageSource ? (
+          ) : showChart && isImageSource ? (
             <motion.div
               key="reverse-engineer"
               initial={{ opacity: 0, y: 20 }}
@@ -115,7 +174,7 @@ function AppContent() {
                 chartRef={chartRef}
               />
             </motion.div>
-          ) : (
+          ) : showChart ? (
             <motion.div
               key="chart"
               initial={{ opacity: 0, y: 20 }}
@@ -151,7 +210,7 @@ function AppContent() {
                 onConfigChange={setChartConfig}
               />
             </motion.div>
-          )}
+          ) : null}
         </AnimatePresence>
       </main>
 
