@@ -1,5 +1,6 @@
 .data-input {
-  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -237,6 +238,41 @@
 .submit-button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Prompt Input */
+.prompt-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.prompt-input-wrapper:focus-within {
+  border-color: var(--accent);
+}
+
+.prompt-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.prompt-input {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.prompt-input::placeholder {
+  color: var(--text-muted);
 }
 
 /* Error Message */

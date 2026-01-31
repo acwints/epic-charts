@@ -12,6 +12,7 @@ import {
   Check,
   AlertCircle,
   Sparkles,
+  MessageSquare,
 } from 'lucide-react';
 import type { ChartData } from '../types';
 import { analyzeImage } from '../services/imageAnalysis';
@@ -35,6 +36,7 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
   const [mode, setMode] = useState<InputMode>('paste');
   const [pasteContent, setPasteContent] = useState('');
   const [sheetsUrl, setSheetsUrl] = useState('');
+  const [userPrompt, setUserPrompt] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -71,8 +73,8 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
       }),
     }));
 
-    return { labels, series, sourceType, xAxisLabel };
-  }, []);
+    return { labels, series, sourceType, xAxisLabel, userPrompt: userPrompt.trim() || undefined };
+  }, [userPrompt]);
 
   const handleFileUpload = useCallback((file: File) => {
     setError(null);
@@ -123,14 +125,14 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
 
     try {
       const data = await analyzeImage(file);
-      onSubmit(data);
+      onSubmit({ ...data, userPrompt: userPrompt.trim() || undefined });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze image');
       setFileName(null);
     } finally {
       setIsAnalyzing(false);
     }
-  }, [onSubmit]);
+  }, [onSubmit, userPrompt]);
 
   const handlePasteSubmit = useCallback(() => {
     setError(null);
@@ -161,10 +163,11 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
           { name: 'Sessions', data: [2400, 3800, 6500, 9800, 8200, 11500] },
         ],
         sourceType: 'sheets',
+        userPrompt: userPrompt.trim() || undefined,
       };
       onSubmit(demoData);
     }, 1200);
-  }, [sheetsUrl, onSubmit]);
+  }, [sheetsUrl, onSubmit, userPrompt]);
 
   return (
     <div className="data-input">
@@ -324,6 +327,17 @@ export function DataInput({ onSubmit, isProcessing }: DataInputProps) {
           )}
         </motion.div>
       </AnimatePresence>
+
+      <div className="prompt-input-wrapper">
+        <MessageSquare size={18} className="prompt-icon" />
+        <input
+          type="text"
+          className="prompt-input"
+          placeholder="Optional: Add instructions for the AI (e.g., 'Focus on year-over-year growth')"
+          value={userPrompt}
+          onChange={(e) => setUserPrompt(e.target.value)}
+        />
+      </div>
 
       <AnimatePresence>
         {error && (

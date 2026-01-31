@@ -13,6 +13,7 @@ export interface ChartData {
   aiSummary?: string;
   xAxisLabel?: string;
   yAxisLabel?: string;
+  userPrompt?: string;
 }
 
 export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'radar' | 'scatter' | 'table' | 'infographic';

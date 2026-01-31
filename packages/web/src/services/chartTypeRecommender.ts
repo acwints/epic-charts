@@ -30,6 +30,10 @@ export async function recommendChartType(
     ? `Preferred chart type: ${options.preferredType} (use this type and justify it)`
     : 'No preferred chart type provided';
 
+  const userPromptLine = data.userPrompt
+    ? `\nUser instructions: ${data.userPrompt}\nConsider these instructions when analyzing the data and making your recommendation.`
+    : '';
+
   const prompt = `You are a data visualization expert and analyst. Analyze the provided data and recommend the best chart type. Consider:
 - Data relationships and patterns
 - Number of data points and series
@@ -38,7 +42,7 @@ export async function recommendChartType(
 - Readability and clarity for the end user
 
 Available chart types: bar, line, area, pie, radar, scatter, table
-${preferredTypeLine}
+${preferredTypeLine}${userPromptLine}
 
 Respond with JSON only (no markdown):
 {
